@@ -1,12 +1,11 @@
 services:
   maven:
-    user: root
-    build: ./myapp
+    build: ./app
     volumes:
-      - ./myapp:/myapp
-      - appwar:/app/target # TomcatへのWAR受け渡し用
-    # WARをビルドしてTomcatとの受け渡し用のディレクトリにコピーする
-    command: /bin/sh -c "mvn clean package -DskipTests && cp /myapp/target/myapp.war /app/target/myapp.war"
+      - ./app:/app    # ホスト - Mavenコンテナ間のマウント（ソースコード共有用）
+      - appwar:/share # Mavenコンテナ - Tomcatコンテナ間のマウント（WAR受け渡し用） 
+    # WARをビルドしてTomcatへの受け渡し用のディレクトリにコピーする
+    command: /bin/sh -c "mvn clean package -DskipTests && cp /app/target/app.war /share/app.war"
   tomcat:
     image: tomcat:10-jdk17-temurin
     ports:
